@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000B\u0000B\u0000D\u0000_\u0000M\u0000a\u0000z\u0000e\u0000_\u0000G\u0000a\u0000m\u0000e\u0000_\u0000T\u00006\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shailyn-Ramsamy/BBD_Maze_Game_T6.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shailyn-Ramsamy/BBD_Maze_Game_T6/issues"
+  },
+  "homepage": "https://github.com/Shailyn-Ramsamy/BBD_Maze_Game_T6#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
