@@ -1,0 +1,626 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: 100%;
+    margin: 0;
+}
+
+@keyframes animate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        border-radius: 0;
+    }
+
+    100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        border-radius: 50%;
+    }
+}
+
+@keyframes animate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        border-radius: 0;
+    }
+
+    100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        border-radius: 50%;
+    }
+}
+
+.menubar {
+    z-index: 1;
+}
+
+p {
+    margin: 0;
+    margin-left: 10px;
+    color: #40531a;
+    font-weight: 800;
+}
+
+.background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    background: #4fc968;
+    overflow: hidden;
+}
+
+.background li {
+    position: absolute;
+    display: block;
+    list-style: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    animation: animate 19s linear infinite;
+}
+
+.background li:nth-child(0) {
+    left: 2%;
+    width: 120px;
+    height: 120px;
+    bottom: -120px;
+    animation-delay: 1s;
+}
+
+.background li:nth-child(1) {
+    left: 9%;
+    width: 195px;
+    height: 195px;
+    bottom: -195px;
+    animation-delay: 2s;
+}
+
+.background li:nth-child(2) {
+    left: 69%;
+    width: 176px;
+    height: 176px;
+    bottom: -176px;
+    animation-delay: 7s;
+}
+
+.background li:nth-child(3) {
+    left: 16%;
+    width: 125px;
+    height: 125px;
+    bottom: -125px;
+    animation-delay: 1s;
+}
+
+.background li:nth-child(4) {
+    left: 25%;
+    width: 115px;
+    height: 115px;
+    bottom: -115px;
+    animation-delay: 12s;
+}
+
+.background li:nth-child(5) {
+    left: 26%;
+    width: 181px;
+    height: 181px;
+    bottom: -181px;
+    animation-delay: 23s;
+}
+
+.background li:nth-child(6) {
+    left: 3%;
+    width: 180px;
+    height: 180px;
+    bottom: -180px;
+    animation-delay: 25s;
+}
+
+.background li:nth-child(7) {
+    left: 38%;
+    width: 136px;
+    height: 136px;
+    bottom: -136px;
+    animation-delay: 19s;
+}
+
+.background li:nth-child(8) {
+    left: 1%;
+    width: 115px;
+    height: 115px;
+    bottom: -115px;
+    animation-delay: 31s;
+}
+
+.background li:nth-child(9) {
+    left: 55%;
+    width: 100px;
+    height: 100px;
+    bottom: -100px;
+    animation-delay: 6s;
+}
+
+#mazeCanvas {
+    position: absolute;
+    margin-top: 60px;
+    margin-left: -370px;
+    background-color: #7FA347;
+    border: 5px solid #4E6227;
+    border-radius: 10px;
+}
+
+.msgbox {
+    position: absolute;
+    height: 200px;
+    width: 200px;
+    border-radius: 15px;
+    border: 5px solid #FFD700;
+    background-color: #1E90FF;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    visibility: hidden;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+}
+
+.msgbox h1 {
+    color: #FFD700;
+    margin-top: 20px;
+}
+
+.msgbox h2 {
+    color: #ffffff;
+    margin-top: 10px;
+}
+
+.msgbox button {
+    background-color: #FFD700;
+    color: #000000;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.msgbox button:hover {
+    background-color: #FFC125;
+}
+
+.startbtn {
+    background-color: #af4c91;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.5s ease;
+}
+
+.startbtn:hover {
+    background-color: #64035f;
+}
+
+#btnUp,
+#btnDown,
+#btnRight,
+#btnLeft {
+    background-color: #db6334;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#btnUp:hover,
+#btnDown:hover,
+#btnRight:hover,
+#btnLeft:hover {
+    background-color: #b92929;
+}
+
+@keyframes blinkBorder {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px #c01826;
+    }
+
+    50% {
+        box-shadow: none;
+    }
+}
+
+.startbtn.blink {
+    animation: blinkBorder 2s linear infinite;
+}
+
+@media screen and (max-width: 568px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -165px;
+
+    }
+
+    #arrowMessage {
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .background li {
+        width: 15px;
+        height: 15px;
+    }
+
+}
+
+@media screen and (max-width: 360px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -130px;
+
+    }
+}
+
+@media screen and (max-width: 328px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -120px;
+
+    }
+}
+
+@media screen and (max-width: 278px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -100px;
+
+    }
+
+}
+
+@media screen and (max-width: 580px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -165px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -130px;
+    }
+
+    .msgbox {
+        width: 50%;
+        height: 35%;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    body {
+        flex-direction: column;
+    }
+
+    #mazeCanvas {
+        width: 70%;
+        margin-left: -100px;
+    }
+
+    .msgbox {
+        width: 40%;
+        height: 38%;
+    }
+
+    .msgbox button {
+        padding: 5px 10px;
+    }
+}
+
+body {
+    /* https://coolors.co/f06449-ede6e3-7d82b8-36382e-613f75  */
+    --background-color: #ede6e3;
+    --wall-color: #36382e;
+    --joystick-color: #210124;
+    --joystick-head-color: #f06449;
+    --ball-color: #f06449;
+    --end-color: #7d82b8;
+    --text-color: #210124;
+
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+#center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#game {
+    display: grid;
+    grid-template-columns: auto 150px;
+    grid-template-rows: 1fr auto 1fr;
+    gap: 30px;
+    perspective: 600px;
+}
+
+#maze {
+    position: relative;
+    grid-row: 1 / -1;
+    grid-column: 1;
+    width: 350px;
+    height: 315px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#end {
+    width: 65px;
+    height: 65px;
+    border: 5px dashed var(--end-color);
+    border-radius: 50%;
+}
+
+#joystick {
+    position: relative;
+    background-color: var(--joystick-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 50px;
+    grid-row: 2;
+}
+
+#joystick-head {
+    position: relative;
+    background-color: var(--joystick-head-color);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: grab;
+
+    animation-name: glow;
+    animation-duration: 0.6s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
+    animation-delay: 4s;
+}
+
+@keyframes glow {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+.joystick-arrow:nth-of-type(1) {
+    position: absolute;
+    bottom: 55px;
+
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+
+    border-bottom: 10px solid var(--joystick-color);
+}
+
+.joystick-arrow:nth-of-type(2) {
+    position: absolute;
+    top: 55px;
+
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+
+    border-top: 10px solid var(--joystick-color);
+}
+
+.joystick-arrow:nth-of-type(3) {
+    position: absolute;
+    left: 55px;
+
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+
+    border-left: 10px solid var(--joystick-color);
+}
+
+.joystick-arrow:nth-of-type(4) {
+    position: absolute;
+    right: 55px;
+
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+
+    border-right: 10px solid var(--joystick-color);
+}
+
+#note {
+    grid-row: 3;
+    grid-column: 2;
+    text-align: center;
+    font-size: 0.8em;
+    color: var(--text-color);
+    transition: opacity 2s;
+}
+
+a:visited {
+    color: inherit;
+}
+
+.ball {
+    position: absolute;
+    margin-top: -5px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background-color: var(--ball-color);
+    width: 10px;
+    height: 10px;
+}
+
+.wall {
+    position: absolute;
+    background-color: var(--wall-color);
+    transform-origin: top center;
+    margin-left: -5px;
+}
+
+.wall::before,
+.wall::after {
+    display: block;
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: inherit;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.wall::before {
+    top: -5px;
+}
+
+.wall::after {
+    bottom: -5px;
+}
+
+.black-hole {
+    position: absolute;
+    margin-top: -9px;
+    margin-left: -9px;
+    border-radius: 50%;
+    background-color: black;
+    width: 18px;
+    height: 18px;
+}
+
+#youtube,
+#youtube-card {
+    display: none;
+}
+
+@media (min-height: 425px) {
+
+    /** Youtube logo by https://codepen.io/alvaromontoro */
+    #youtube {
+        z-index: 2;
+        display: block;
+        width: 100px;
+        height: 70px;
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: red;
+        border-radius: 50% / 11%;
+        transform: scale(0.8);
+        transition: transform 0.5s;
+    }
+
+    #youtube:hover,
+    #youtube:focus {
+        transform: scale(0.9);
+    }
+
+    #youtube::before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 7.5%;
+        left: -6%;
+        width: 112%;
+        height: 85%;
+        background: red;
+        border-radius: 9% / 50%;
+    }
+
+    #youtube::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        width: 45px;
+        height: 30px;
+        border: 15px solid transparent;
+        box-sizing: border-box;
+        border-left: 30px solid white;
+    }
+
+    #youtube span {
+        font-size: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+    }
+
+    #youtube:hover+#youtube-card {
+        display: block;
+        position: absolute;
+        bottom: 12px;
+        right: 10px;
+        padding: 25px 130px 25px 25px;
+        width: 300px;
+        background-color: white;
+    }
+}

@@ -1,61 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Multiplayer Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Maze Game</title>
 </head>
 
 <body>
-    <h1>Welcome to the Multiplayer Game</h1>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        const players = {};
 
-        socket.on('connect', () => {
-            console.log('connected to server');
-        });
+    <div class="menubar">
 
-        socket.on('currentPlayers', (currentPlayers) => {
-            for (let id in currentPlayers) {
-                if (currentPlayers.hasOwnProperty(id)) {
-                    players[id] = currentPlayers[id];
-                    console.log(`Player ${id} is at`, currentPlayers[id]);
-                    // Update your game state and render here
-                }
-            }
-        });
+    </div>
+    <ul class="background">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <div id="center">
+        <div id="game">
+            <div id="maze">
+                <div id="end"></div>
+            </div>
+            <div id="joystick">
+                <div class="joystick-arrow"></div>
+                <div class="joystick-arrow"></div>
+                <div class="joystick-arrow"></div>
+                <div class="joystick-arrow"></div>
+                <div id="joystick-head"></div>
+            </div>
+            <div id="note">
+                Click the joystick to start!
+                <p>Move every ball to the center. Ready for hard mode? Press H</p>
+            </div>
+        </div>
+    </div>
+    <a id="youtube" href="https://youtu.be/bTk6dcAckuI" target="_top">
+        <span>See how this game was made</span>
+    </a>
 
-        socket.on('newPlayer', (player) => {
-            players[player.id] = player.position;
-            console.log(`New player ${player.id} joined at`, player.position);
-            // Update your game state and render here
-        });
-
-        socket.on('playerMoved', (player) => {
-            if (players[player.id]) {
-                players[player.id] = player.position;
-                console.log(`Player ${player.id} moved to`, player.position);
-                // Update your game state and render here
-            }
-        });
-
-        socket.on('playerDisconnected', (id) => {
-            delete players[id];
-            console.log(`Player ${id} disconnected`);
-            // Update your game state and render here
-        });
-
-        // Example: Emit a player move
-        function playerMove(moveData) {
-            socket.emit('playerMove', moveData);
-        }
-
-        // Simulate a move after 3 seconds
-        setTimeout(() => {
-            playerMove({ x: 100, y: 200 });
-        }, 3000);
-    </script>
+    <script src="scripts.js"></script>
 </body>
 
 </html>

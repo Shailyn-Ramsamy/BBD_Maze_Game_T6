@@ -2,36 +2,32 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
-// Create an Express app
+// Create an Express app and an HTTP server
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve static files from the 'public' directory
+// Serve static files from the "public" directory
 app.use(express.static('public'));
 
-// Handle new WebSocket connections
+// Handle WebSocket connections
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log('A user connected');
 
-    // Handle player move events
-    socket.on('playerMove', (data) => {
-        console.log('Player moved:', data);
-        // Broadcast the move to all other clients
-        socket.broadcast.emit('playerMoved', data);
+    // Relay gyroscope data to all connected clients
+    socket.on('gyroscopeData', (data) => {
+        socket.broadcast.emit('gyroscopeData', data);
     });
 
-    // Handle disconnections
+
+
     socket.on('disconnect', () => {
-        console.log('user disconnected');
+        console.log('A user disconnected');
     });
 });
 
-// Define the port and host
-const PORT = process.env.PORT || 3000;
-const HOST = '192.168.47.108'; // Replace with your computer's local IP address
-
 // Start the server
-server.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
