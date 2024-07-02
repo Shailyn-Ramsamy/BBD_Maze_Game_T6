@@ -110,6 +110,44 @@ let balls = [];
 let ballElements = [];
 let holeElements = [];
 
+if (window.DeviceOrientationEvent) {
+  window.addEventListener("deviceorientation", handleOrientation, true);
+} else {
+  console.log("Sorry, your browser doesn't support Device Orientation");
+}
+
+function handleOrientation(event) {
+  const alpha = event.alpha;
+  const beta = event.beta;
+  const gamma = event.gamma;
+
+  // Adjust the maze tilt based on the gyroscope readings
+  const rotationY = gamma * 0.8; // Adjust the multiplier based on sensitivity
+  const rotationX = beta * 0.8; // Adjust the multiplier based on sensitivity
+
+  mazeElement.style.cssText = `
+    transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
+  `;
+
+
+  const gravity = 2;
+  const friction = 0.01; // Coefficients of friction
+
+  accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
+  accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
+  frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
+  frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
+  console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
+
+  // Calculate acceleration and friction based on gyroscope readings if needed
+  // Example:
+  // accelerationX = calculateAccelerationX(alpha, beta, gamma);
+  // accelerationY = calculateAccelerationY(alpha, beta, gamma);
+  // frictionX = calculateFrictionX(alpha, beta, gamma);
+  // frictionY = calculateFrictionY(alpha, beta, gamma);
+}
+
+
 resetGame();
 
 // Draw balls for the first time

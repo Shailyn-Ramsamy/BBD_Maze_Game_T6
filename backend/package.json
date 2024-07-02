@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Shailyn-Ramsamy/BBD_Maze_Game_T6#readme",
   "dependencies": {
     "express": "^4.19.2",
+    "http-server": "^14.1.1",
     "socket.io": "^4.7.5"
   }
 }
