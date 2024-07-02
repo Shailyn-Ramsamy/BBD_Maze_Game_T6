@@ -147,6 +147,32 @@ function handleOrientation(event) {
   // frictionY = calculateFrictionY(alpha, beta, gamma);
 }
 
+let initialGamma = 0; // Store initial gamma angle
+
+if (window.DeviceOrientationEvent) {
+  // Listen for deviceorientation event
+  window.addEventListener("deviceorientation", function (event) {
+    if (initialGamma === 0) {
+      initialGamma = event.gamma; // Store initial gamma angle
+      setInitialMazeOrientation(initialGamma);
+    }
+  }, true);
+} else {
+  console.log("Sorry, your browser doesn't support Device Orientation");
+}
+
+function setInitialMazeOrientation(initialGamma) {
+  // Adjust the maze tilt based on the gyroscope readings
+  const rotationY = initialGamma * 0.8; // Adjust the multiplier based on sensitivity
+  const rotationX = 0; // Adjust based on your specific requirements
+
+  mazeElement.style.cssText = `
+    transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg);
+  `;
+
+  // Initialize other game components or start the game here if needed
+  resetGame();
+}
 
 resetGame();
 
@@ -160,111 +186,138 @@ balls.forEach(({ x, y }) => {
   ballElements.push(ball);
 });
 
-// Wall metadata
-const walls = [
-  // Border
-  { column: 0, row: 0, horizontal: true, length: 10 },
-  { column: 0, row: 0, horizontal: false, length: 9 },
-  { column: 0, row: 9, horizontal: true, length: 10 },
-  { column: 10, row: 0, horizontal: false, length: 9 },
+const rows = 10;
+const cols = 10;
 
-  // Horizontal lines starting in 1st column
-  { column: 0, row: 6, horizontal: true, length: 1 },
-  { column: 0, row: 8, horizontal: true, length: 1 },
+const cells = [];
+for (let x = 0; x < cols; x++) {
+    cells[x] = [];
+    for (let y = 0; y < rows; y++) {
+        cells[x][y] = {
+            x,
+            y,
+            walls: { top: true, right: true, bottom: true, left: true },
+            visited: false
+        };
+    }
+}
 
-  // Horizontal lines starting in 2nd column
-  { column: 1, row: 1, horizontal: true, length: 2 },
-  { column: 1, row: 7, horizontal: true, length: 1 },
+function genMaze(x, y) {
+  const presentCell = cells[x][y];
+  presentCell.visited = true;
 
-  // Horizontal lines starting in 3rd column
-  { column: 2, row: 2, horizontal: true, length: 2 },
-  { column: 2, row: 4, horizontal: true, length: 1 },
-  { column: 2, row: 5, horizontal: true, length: 1 },
-  { column: 2, row: 6, horizontal: true, length: 1 },
+  const directions = randomize(['top', 'right', 'bottom', 'left']);
 
-  // Horizontal lines starting in 4th column
-  { column: 3, row: 3, horizontal: true, length: 1 },
-  { column: 3, row: 8, horizontal: true, length: 3 },
+  for (const direction of directions) {
+    const dx = { top: 0, right: 1, bottom: 0, left: -1 }[direction];
+    const dy = { top: -1, right: 0, bottom: 1, left: 0 }[direction];
 
-  // Horizontal lines starting in 5th column
-  { column: 4, row: 6, horizontal: true, length: 1 },
+    const newX = x + dx;
+    const newY = y + dy;
+    // if the coordinates are inbound and not on the border
+    if (newX > 0 && newX < cols - 1 && newY > 0 && newY < rows - 1) {
+      const neighbour = cells[newX][newY];
 
-  // Horizontal lines starting in 6th column
-  { column: 5, row: 2, horizontal: true, length: 2 },
-  { column: 5, row: 7, horizontal: true, length: 1 },
+      // removing walls
+      if (!neighbour.visited) {
+        presentCell.walls[direction] = false;
+        neighbour.walls[{
+          top: 'bottom',
+          right: 'left',
+          bottom: 'top',
+          left: 'right',
+        }[direction]] = false;
+        genMaze(newX, newY);
+      }
+    }
+  }
+  generatedMaze = cells.map(row => row.map(cell => ({ ...cell })));
+  solutionPath = solveMaze();
+}
 
-  // Horizontal lines starting in 7th column
-  { column: 6, row: 1, horizontal: true, length: 1 },
-  { column: 6, row: 6, horizontal: true, length: 2 },
+// Start maze generation from a non-border cell
+genMaze(1, 1);
 
-  // Horizontal lines starting in 8th column
-  { column: 7, row: 3, horizontal: true, length: 2 },
-  { column: 7, row: 7, horizontal: true, length: 2 },
+// Convert cells to walls array
+const walls = [];
+for (let x = 0; x < rows; x++) {
+  for (let y = 0; y < cols; y++) {
+    const cell = cells[x][y];
+    if (x > 0 && cell.walls.left) walls.push({ column: x, row: y, horizontal: false, length: 1 });
+    if (y > 0 && cell.walls.top) walls.push({ column: x, row: y, horizontal: true, length: 1 });
+  }
+}
 
-  // Horizontal lines starting in 9th column
-  { column: 8, row: 1, horizontal: true, length: 1 },
-  { column: 8, row: 2, horizontal: true, length: 1 },
-  { column: 8, row: 3, horizontal: true, length: 1 },
-  { column: 8, row: 4, horizontal: true, length: 2 },
-  { column: 8, row: 8, horizontal: true, length: 2 },
+console.log(walls)
 
-  // Vertical lines after the 1st column
-  { column: 1, row: 1, horizontal: false, length: 2 },
-  { column: 1, row: 4, horizontal: false, length: 2 },
-
-  // Vertical lines after the 2nd column
-  { column: 2, row: 2, horizontal: false, length: 2 },
-  { column: 2, row: 5, horizontal: false, length: 1 },
-  { column: 2, row: 7, horizontal: false, length: 2 },
-
-  // Vertical lines after the 3rd column
-  { column: 3, row: 0, horizontal: false, length: 1 },
-  { column: 3, row: 4, horizontal: false, length: 1 },
-  { column: 3, row: 6, horizontal: false, length: 2 },
-
-  // Vertical lines after the 4th column
-  { column: 4, row: 1, horizontal: false, length: 2 },
-  { column: 4, row: 6, horizontal: false, length: 1 },
-
-  // Vertical lines after the 5th column
-  { column: 5, row: 0, horizontal: false, length: 2 },
-  { column: 5, row: 6, horizontal: false, length: 1 },
-  { column: 5, row: 8, horizontal: false, length: 1 },
-
-  // Vertical lines after the 6th column
-  { column: 6, row: 4, horizontal: false, length: 1 },
-  { column: 6, row: 6, horizontal: false, length: 1 },
-
-  // Vertical lines after the 7th column
-  { column: 7, row: 1, horizontal: false, length: 4 },
-  { column: 7, row: 7, horizontal: false, length: 2 },
-
-  // Vertical lines after the 8th column
-  { column: 8, row: 2, horizontal: false, length: 1 },
-  { column: 8, row: 4, horizontal: false, length: 2 },
-
-  // Vertical lines after the 9th column
-  { column: 9, row: 1, horizontal: false, length: 1 },
-  { column: 9, row: 5, horizontal: false, length: 2 }
-].map((wall) => ({
+// Map walls to pixel positions
+const pixelWalls = walls.map((wall) => ({
   x: wall.column * (pathW + wallW),
   y: wall.row * (pathW + wallW),
   horizontal: wall.horizontal,
   length: wall.length * (pathW + wallW)
 }));
 
-// Draw walls
-walls.forEach(({ x, y, horizontal, length }) => {
+function randomize(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function solveMaze() {
+  const visited =
+    Array.from({ length: rows },
+      () => Array(cols).fill(false));
+  const path = [];
+
+  function dfs(x, y) {
+    if (x < 0 || x >= cols || y < 0 ||
+      y >= rows || visited[y][x]) {
+      return false;
+    }
+
+    visited[y][x] = true;
+    path.push({ x, y });
+
+    if (x === cols - 1 && y === rows - 1) {
+      return true;
+    }
+
+    const cell = generatedMaze[x][y];
+
+    if (!cell.walls.top && dfs(x, y - 1)) {
+      return true;
+    }
+    if (!cell.walls.right && dfs(x + 1, y)) {
+      return true;
+    }
+    if (!cell.walls.bottom && dfs(x, y + 1)) {
+      return true;
+    }
+    if (!cell.walls.left && dfs(x - 1, y)) {
+      return true;
+    }
+
+    path.pop();
+    return false;
+  }
+
+  dfs(0, 0);
+  return path;
+}
+
+pixelWalls.forEach(({ x, y, horizontal, length }) => {
   const wall = document.createElement("div");
   wall.setAttribute("class", "wall");
   wall.style.cssText = `
-       left: ${x}px;
-       top: ${y}px;
-       width: ${wallW}px;
-       height: ${length}px;
-       transform: rotate(${horizontal ? -90 : 0}deg);
-     `;
-
+        left: ${x}px;
+        top: ${y}px;
+        width: ${wallW}px;
+        height: ${length}px;
+        transform: rotate(${horizontal ? -90 : 0}deg);
+    `;
   mazeElement.appendChild(wall);
 });
 
@@ -288,7 +341,6 @@ joystickHeadElement.addEventListener("mousedown", function (event) {
     mouseStartY = event.clientY;
     gameInProgress = true;
     window.requestAnimationFrame(main);
-    noteElement.style.opacity = 0;
     joystickHeadElement.style.cssText = `
          animation: none;
          cursor: grabbing;
@@ -367,27 +419,27 @@ function resetGame() {
        transform: rotateY(0deg) rotateX(0deg)
      `;
 
-  joystickHeadElement.style.cssText = `
-       left: 0;
-       top: 0;
-       animation: glow;
-       cursor: grab;
-     `;
+  // joystickHeadElement.style.cssText = `
+  //      left: 0;
+  //      top: 0;
+  //      animation: glow;
+  //      cursor: grab;
+  //    `;
 
-  if (hardMode) {
-    noteElement.innerHTML = `Click the joystick to start!
-         <p>Hard mode, Avoid black holes. Back to easy mode? Press E</p>`;
-  } else {
-    noteElement.innerHTML = `Click the joystick to start!
-         <p>Move every ball to the center. Ready for hard mode? Press H</p>`;
-  }
-  noteElement.style.opacity = 1;
+  // if (hardMode) {
+  //   noteElement.innerHTML = `Click the joystick to start!
+  //        <p>Hard mode, Avoid black holes. Back to easy mode? Press E</p>`;
+  // } else {
+  //   noteElement.innerHTML = `Click the joystick to start!
+  //        <p>Move every ball to the center. Ready for hard mode? Press H</p>`;
+  // }
+  // noteElement.style.opacity = 1;
 
   balls = [
-    { column: 0, row: 0 },
-    { column: 9, row: 0 },
-    { column: 0, row: 8 },
-    { column: 9, row: 8 }
+    { column: 1, row: 1 },
+    { column: 8, row: 1 },
+    { column: 1, row: 8 },
+    { column: 8, row: 8 }
   ].map((ball) => ({
     x: ball.column * (wallW + pathW) + (wallW / 2 + pathW / 2),
     y: ball.row * (wallW + pathW) + (wallW / 2 + pathW / 2),
@@ -418,6 +470,13 @@ function resetGame() {
       holeElements.push(ball);
     });
   }
+}
+
+function checkBallCollision(ball1, ball2) {
+  const distance = Math.sqrt(
+    Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2)
+  );
+  return distance < ballSize;
 }
 
 function main(timestamp) {
@@ -475,7 +534,7 @@ function main(timestamp) {
 
         if (debugMode) console.log("tick", ball);
 
-        walls.forEach((wall, wi) => {
+        pixelWalls.forEach((wall, wi) => {
           if (wall.horizontal) {
             // Horizontal wall
 
@@ -664,7 +723,19 @@ function main(timestamp) {
             }
           }
         });
+        
 
+        for (let i = 0; i < balls.length - 1; i++) {
+          for (let j = i + 1; j < balls.length; j++) {
+            if (checkBallCollision(balls[i], balls[j])) {
+              // Resolve the collision by swapping their positions
+              const temp = balls[i];
+              balls[i] = balls[j];
+              balls[j] = temp;
+            }
+          }
+        }
+         
         // Detect is a ball fell into a hole
         if (hardMode) {
           holes.forEach((hole, hi) => {

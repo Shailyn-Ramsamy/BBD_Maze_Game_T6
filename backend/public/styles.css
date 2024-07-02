@@ -377,17 +377,15 @@ body {
 
 #center {
     display: flex;
-    align-items: center;
     justify-content: center;
-    height: 100%;
+    align-items: center;
+    height: 100vh;
 }
 
 #game {
-    display: grid;
-    grid-template-columns: auto 150px;
-    grid-template-rows: 1fr auto 1fr;
-    gap: 30px;
-    perspective: 600px;
+    position: relative;
+    width: 100%; /* Adjust width as per your design */
+    max-width: 800px; /* Adjust max-width as needed */
 }
 
 #maze {
