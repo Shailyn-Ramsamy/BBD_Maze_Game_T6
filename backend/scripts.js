@@ -7,6 +7,7 @@ Follow me on twitter for more: https://twitter.com/HunorBorbely
 */
 
 const socket = io();
+let socketId = null;
 
 Math.minmax = (value, limit) => {
   return Math.max(Math.min(value, limit), -limit);
@@ -112,6 +113,11 @@ let balls = [];
 let ballElements = [];
 let holeElements = [];
 
+socket.on('connect', () => {
+  socketId = socket.id;
+  console.log('Connected with socket ID:', socketId);
+});
+
 if (window.DeviceOrientationEvent) {
   window.addEventListener('deviceorientation', handleOrientation);
 } else if (window.DeviceMotionEvent) {
@@ -133,7 +139,6 @@ function handleOrientation(event) {
     transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
   `;
 
-
   const gravity = 2;
   const friction = 0.01; // Coefficients of friction
 
@@ -144,8 +149,7 @@ function handleOrientation(event) {
   console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
 
   // Emit orientation data to the server
-  socket.emit('gyroscopeData', { alpha, beta, gamma });
-  
+  socket.emit('gyroscopeData', { socketId, alpha, beta, gamma });  
   console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
 
 }
