@@ -111,9 +111,11 @@ let ballElements = [];
 let holeElements = [];
 
 if (window.DeviceOrientationEvent) {
-  window.addEventListener("deviceorientation", handleOrientation, true);
+  window.addEventListener('deviceorientation', handleOrientation);
+} else if (window.DeviceMotionEvent) {
+  window.addEventListener('devicemotion', handleMotion);
 } else {
-  console.log("Sorry, your browser doesn't support Device Orientation");
+  console.log("Device orientation or motion not supported.");
 }
 
 function handleOrientation(event) {
@@ -138,16 +140,9 @@ function handleOrientation(event) {
   frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
   frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
   console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
-
-  // Calculate acceleration and friction based on gyroscope readings if needed
-  // Example:
-  // accelerationX = calculateAccelerationX(alpha, beta, gamma);
-  // accelerationY = calculateAccelerationY(alpha, beta, gamma);
-  // frictionX = calculateFrictionX(alpha, beta, gamma);
-  // frictionY = calculateFrictionY(alpha, beta, gamma);
 }
 
-let initialGamma = 0; // Store initial gamma angle
+let initialGamma = 0;
 
 if (window.DeviceOrientationEvent) {
   // Listen for deviceorientation event
@@ -735,7 +730,7 @@ function main(timestamp) {
             }
           }
         }
-         
+
         // Detect is a ball fell into a hole
         if (hardMode) {
           holes.forEach((hole, hi) => {
