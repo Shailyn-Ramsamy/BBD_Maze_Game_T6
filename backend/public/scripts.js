@@ -248,12 +248,12 @@ pixelWalls.forEach(({ x, y, horizontal, length }) => {
   const wall = document.createElement("div");
   wall.setAttribute("class", "wall");
   wall.style.cssText = `
-          left: ${x}px;
-          top: ${y}px;
-          width: ${wallW}px;
-          height: ${length}px;
-          transform: rotate(${horizontal ? -90 : 0}deg);
-      `;
+              left: ${x}px;
+              top: ${y}px;
+              width: ${wallW}px;
+              height: ${length}px;
+              transform: rotate(${horizontal ? -90 : 0}deg);
+          `;
   mazeElement.appendChild(wall);
 });
 
@@ -279,9 +279,9 @@ joystickHeadElement.addEventListener("mousedown", function (event) {
     window.requestAnimationFrame(main);
     noteElement.style.opacity = 0;
     joystickHeadElement.style.cssText = `
-         animation: none;
-         cursor: grabbing;
-       `;
+            animation: none;
+            cursor: grabbing;
+          `;
   }
 });
 
@@ -291,18 +291,18 @@ window.addEventListener("mousemove", function (event) {
     const mouseDeltaY = -Math.minmax(mouseStartY - event.clientY, 15);
 
     joystickHeadElement.style.cssText = `
-         left: ${mouseDeltaX}px;
-         top: ${mouseDeltaY}px;
-         animation: none;
-         cursor: grabbing;
-       `;
+            left: ${mouseDeltaX}px;
+            top: ${mouseDeltaY}px;
+            animation: none;
+            cursor: grabbing;
+          `;
 
     const rotationY = mouseDeltaX * 0.8; // Max rotation = 12
     const rotationX = mouseDeltaY * 0.8;
 
     mazeElement.style.cssText = `
-         transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
-       `;
+            transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
+          `;
 
     const gravity = 2;
     const friction = 0.01; // Coefficients of friction
@@ -330,12 +330,27 @@ joystickHeadElement.addEventListener("touchstart", function (event) {
 
 window.addEventListener("deviceorientation", function (event) {
   if (gameInProgress) {
-    const mouseDeltaX = -Math.min(15, Math.max(-15, mouseStartX - event.alpha));
-    const mouseDeltaY = -Math.min(15, Math.max(-15, mouseStartY - event.beta));
+    const rotationY = Math.min(15, Math.max(-15, event.alpha - 180)); // Adjust range if needed
+    const rotationX = Math.min(15, Math.max(-15, event.beta - 90));  // Adjust range if needed
 
-    handleMovement(mouseDeltaX, mouseDeltaY);
+    handleMovement(rotationY, rotationX);
   }
 });
+
+function handleMovement(rotationY, rotationX) {
+  const gravity = 2;
+  const friction = 0.01; // Coefficients of friction
+
+  accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
+  accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
+  frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
+  frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
+
+  mazeElement.style.cssText = `
+        transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
+      `;
+}
+
 
 
 window.addEventListener("keydown", function (event) {
@@ -377,22 +392,22 @@ function resetGame() {
   frictionY = undefined;
 
   mazeElement.style.cssText = `
-       transform: rotateY(0deg) rotateX(0deg)
-     `;
+          transform: rotateY(0deg) rotateX(0deg)
+        `;
 
   joystickHeadElement.style.cssText = `
-       left: 0;
-       top: 0;
-       animation: glow;
-       cursor: grab;
-     `;
+          left: 0;
+          top: 0;
+          animation: glow;
+          cursor: grab;
+        `;
 
   if (hardMode) {
     noteElement.innerHTML = `Click the joystick to start!
-         <p>Hard mode, Avoid black holes. Back to easy mode? Press E</p>`;
+            <p>Hard mode, Avoid black holes. Back to easy mode? Press E</p>`;
   } else {
     noteElement.innerHTML = `Click the joystick to start!
-         <p>Move every ball to the center. Ready for hard mode? Press H</p>`;
+            <p>Move every ball to the center. Ready for hard mode? Press H</p>`;
   }
   noteElement.style.opacity = 1;
 
@@ -712,13 +727,13 @@ function main(timestamp) {
       )
     ) {
       noteElement.innerHTML = `Congrats, you did it!
-         ${!hardMode ? "<p>Press H for hard mode</p>" : ""}
-         <p>
-           Follow me
-           <a href="https://twitter.com/HunorBorbely" , target="_top"
-             >@HunorBorbely</a
-           >
-         </p>`;
+            ${!hardMode ? "<p>Press H for hard mode</p>" : ""}
+            <p>
+              Follow me
+              <a href="https://twitter.com/HunorBorbely" , target="_top"
+                >@HunorBorbely</a
+              >
+            </p>`;
       noteElement.style.opacity = 1;
       gameInProgress = false;
     } else {
@@ -728,9 +743,9 @@ function main(timestamp) {
   } catch (error) {
     if (error.message == "The ball fell into a hole") {
       noteElement.innerHTML = `A ball fell into a black hole! Press space to reset the game.
-         <p>
-           Back to easy? Press E
-         </p>`;
+            <p>
+              Back to easy? Press E
+            </p>`;
       noteElement.style.opacity = 1;
       gameInProgress = false;
     } else throw error;
