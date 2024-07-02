@@ -376,22 +376,20 @@ body {
 }
 
 #center {
-    display: flex;
+    display: block;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 50vh;
 }
 
 #game {
-    position: relative;
-    width: 100%; /* Adjust width as per your design */
-    max-width: 800px; /* Adjust max-width as needed */
+    display: flex;
+    flex-direction: column; /* Stack maze and joystick vertically */
+    align-items: center; /* Center items horizontally */
 }
 
 #maze {
     position: relative;
-    grid-row: 1 / -1;
-    grid-column: 1;
     width: 350px;
     height: 315px;
     display: flex;
@@ -415,8 +413,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 10px 50px;
-    grid-row: 2;
+    margin-top: 100px; /* Adjust margin as needed */
+    margin-left: 150px;
+    
 }
 
 #joystick-head {
@@ -443,54 +442,6 @@ body {
     100% {
         transform: scale(1.2);
     }
-}
-
-.joystick-arrow:nth-of-type(1) {
-    position: absolute;
-    bottom: 55px;
-
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-
-    border-bottom: 10px solid var(--joystick-color);
-}
-
-.joystick-arrow:nth-of-type(2) {
-    position: absolute;
-    top: 55px;
-
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-
-    border-top: 10px solid var(--joystick-color);
-}
-
-.joystick-arrow:nth-of-type(3) {
-    position: absolute;
-    left: 55px;
-
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-
-    border-left: 10px solid var(--joystick-color);
-}
-
-.joystick-arrow:nth-of-type(4) {
-    position: absolute;
-    right: 55px;
-
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-
-    border-right: 10px solid var(--joystick-color);
 }
 
 #note {
