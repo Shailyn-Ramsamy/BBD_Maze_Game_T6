@@ -89,7 +89,16 @@ const slow = (number, difference) => {
 };
 
 const mazeElement = document.getElementById("maze");
-const joystickHeadElement = document.getElementById("joystick-head");
+const joystickButton = document.getElementById("joystick-head");
+joystickButton.addEventListener("click", startGame);
+
+function startGame() {
+  if (!gameInProgress) {
+    gameInProgress = true;
+    window.requestAnimationFrame(main);
+  }
+}
+
 const noteElement = document.getElementById("note"); // Note element for instructions and game won, game failed texts
 
 let hardMode = false;
@@ -346,47 +355,47 @@ const holes = [
   y: hole.row * (wallW + pathW) + (wallW / 2 + pathW / 2)
 }));
 
-joystickHeadElement.addEventListener("mousedown", function (event) {
-  if (!gameInProgress) {
-    mouseStartX = event.clientX;
-    mouseStartY = event.clientY;
-    gameInProgress = true;
-    window.requestAnimationFrame(main);
-    joystickHeadElement.style.cssText = `
-         animation: none;
-         cursor: grabbing;
-       `;
-  }
-});
+// joystickHeadElement.addEventListener("mousedown", function (event) {
+//   if (!gameInProgress) {
+//     mouseStartX = event.clientX;
+//     mouseStartY = event.clientY;
+//     gameInProgress = true;
+//     window.requestAnimationFrame(main);
+//     joystickHeadElement.style.cssText = `
+//          animation: none;
+//          cursor: grabbing;
+//        `;
+//   }
+// });
 
-window.addEventListener("mousemove", function (event) {
-  if (gameInProgress) {
-    const mouseDeltaX = -Math.minmax(mouseStartX - event.clientX, 15);
-    const mouseDeltaY = -Math.minmax(mouseStartY - event.clientY, 15);
+// window.addEventListener("mousemove", function (event) {
+//   if (gameInProgress) {
+//     const mouseDeltaX = -Math.minmax(mouseStartX - event.clientX, 15);
+//     const mouseDeltaY = -Math.minmax(mouseStartY - event.clientY, 15);
 
-    joystickHeadElement.style.cssText = `
-         left: ${mouseDeltaX}px;
-         top: ${mouseDeltaY}px;
-         animation: none;
-         cursor: grabbing;
-       `;
+//     joystickHeadElement.style.cssText = `
+//          left: ${mouseDeltaX}px;
+//          top: ${mouseDeltaY}px;
+//          animation: none;
+//          cursor: grabbing;
+//        `;
 
-    const rotationY = mouseDeltaX * 0.8; // Max rotation = 12
-    const rotationX = mouseDeltaY * 0.8;
+//     const rotationY = mouseDeltaX * 0.8; // Max rotation = 12
+//     const rotationX = mouseDeltaY * 0.8;
 
-    mazeElement.style.cssText = `
-         transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
-       `;
+//     mazeElement.style.cssText = `
+//          transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
+//        `;
 
-    const gravity = 2;
-    const friction = 0.01; // Coefficients of friction
+//     const gravity = 2;
+//     const friction = 0.01; // Coefficients of friction
 
-    accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
-    accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
-    frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
-    frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
-  }
-});
+//     accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
+//     accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
+//     frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
+//     frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
+//   }
+// });
 
 window.addEventListener("keydown", function (event) {
   // If not an arrow key or space or H was pressed then return
