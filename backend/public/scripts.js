@@ -328,7 +328,7 @@ joystickHeadElement.addEventListener("touchstart", function (event) {
   }
 });
 
-window.addEventListener("deviceorientation", function (event) {
+window.addEventListener("deviceorientation", (event) => {
   if (gameInProgress) {
     const rotationY = Math.min(15, Math.max(-15, event.alpha - 180)); // Adjust range if needed
     const rotationX = Math.min(15, Math.max(-15, event.beta - 90));  // Adjust range if needed
