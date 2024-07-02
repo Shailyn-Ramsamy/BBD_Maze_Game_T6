@@ -6,6 +6,8 @@ Follow me on twitter for more: https://twitter.com/HunorBorbely
 
 */
 
+const socket = io();
+
 Math.minmax = (value, limit) => {
   return Math.max(Math.min(value, limit), -limit);
 };
@@ -140,6 +142,12 @@ function handleOrientation(event) {
   frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
   frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
   console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
+
+  // Emit orientation data to the server
+  socket.emit('gyroscopeData', { alpha, beta, gamma });
+  
+  console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
+
 }
 
 let initialGamma = 0;
