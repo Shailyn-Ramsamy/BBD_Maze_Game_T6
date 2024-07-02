@@ -127,18 +127,28 @@ if (window.DeviceOrientationEvent) {
 }
 
 function handleOrientation(event) {
-  const alpha = event.alpha;
   const beta = event.beta;
   const gamma = event.gamma;
 
-  // Adjust the maze tilt based on the gyroscope readings
-  const rotationY = gamma * 0.8; // Adjust the multiplier based on sensitivity
-  const rotationX = beta * 0.8; // Adjust the multiplier based on sensitivity
+  // Emit orientation data to the server with socket ID
+  socket.emit('gyroscopeData', { socketId, beta, gamma });
+  
+  console.log(`Orientation - Beta: ${beta}, Gamma: ${gamma}`);
+}
+
+// Listen for average orientation updates from the server
+socket.on('averageOrientation', (averageOrientation) => {
+  console.log('Received average orientation:', averageOrientation);
+  
+  // Apply the average orientation to the maze
+  const rotationY = averageOrientation.gamma * 0.8; // Adjust the multiplier based on sensitivity
+  const rotationX = averageOrientation.beta * 0.8; // Adjust the multiplier based on sensitivity
 
   mazeElement.style.cssText = `
     transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
   `;
 
+  // Update game physics based on average orientation
   const gravity = 2;
   const friction = 0.01; // Coefficients of friction
 
@@ -146,13 +156,7 @@ function handleOrientation(event) {
   accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
   frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
   frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
-  console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
-
-  // Emit orientation data to the server
-  socket.emit('gyroscopeData', { socketId, alpha, beta, gamma });  
-  console.log(`Orientation - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`);
-
-}
+});
 
 let initialGamma = 0;
 
