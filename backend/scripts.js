@@ -206,139 +206,156 @@ balls.forEach(({ x, y }) => {
   ballElements.push(ball);
 });
 
-const rows = 10;
-const cols = 10;
+// const rows = 10;
+// const cols = 10;
 
-const cells = [];
-for (let x = 0; x < cols; x++) {
-    cells[x] = [];
-    for (let y = 0; y < rows; y++) {
-        cells[x][y] = {
-            x,
-            y,
-            walls: { top: true, right: true, bottom: true, left: true },
-            visited: false
-        };
-    }
-}
+// const cells = [];
+// for (let x = 0; x < cols; x++) {
+//     cells[x] = [];
+//     for (let y = 0; y < rows; y++) {
+//         cells[x][y] = {
+//             x,
+//             y,
+//             walls: { top: true, right: true, bottom: true, left: true },
+//             visited: false
+//         };
+//     }
+// }
 
-function genMaze(x, y) {
-  const presentCell = cells[x][y];
-  presentCell.visited = true;
+// function genMaze(x, y) {
+//   const presentCell = cells[x][y];
+//   presentCell.visited = true;
 
-  const directions = randomize(['top', 'right', 'bottom', 'left']);
+//   const directions = randomize(['top', 'right', 'bottom', 'left']);
 
-  for (const direction of directions) {
-    const dx = { top: 0, right: 1, bottom: 0, left: -1 }[direction];
-    const dy = { top: -1, right: 0, bottom: 1, left: 0 }[direction];
+//   for (const direction of directions) {
+//     const dx = { top: 0, right: 1, bottom: 0, left: -1 }[direction];
+//     const dy = { top: -1, right: 0, bottom: 1, left: 0 }[direction];
 
-    const newX = x + dx;
-    const newY = y + dy;
-    // if the coordinates are inbound and not on the border
-    if (newX > 0 && newX < cols - 1 && newY > 0 && newY < rows - 1) {
-      const neighbour = cells[newX][newY];
+//     const newX = x + dx;
+//     const newY = y + dy;
+//     // if the coordinates are inbound and not on the border
+//     if (newX > 0 && newX < cols - 1 && newY > 0 && newY < rows - 1) {
+//       const neighbour = cells[newX][newY];
 
-      // removing walls
-      if (!neighbour.visited) {
-        presentCell.walls[direction] = false;
-        neighbour.walls[{
-          top: 'bottom',
-          right: 'left',
-          bottom: 'top',
-          left: 'right',
-        }[direction]] = false;
-        genMaze(newX, newY);
-      }
-    }
-  }
-  generatedMaze = cells.map(row => row.map(cell => ({ ...cell })));
-  solutionPath = solveMaze();
-}
+//       // removing walls
+//       if (!neighbour.visited) {
+//         presentCell.walls[direction] = false;
+//         neighbour.walls[{
+//           top: 'bottom',
+//           right: 'left',
+//           bottom: 'top',
+//           left: 'right',
+//         }[direction]] = false;
+//         genMaze(newX, newY);
+//       }
+//     }
+//   }
+//   generatedMaze = cells.map(row => row.map(cell => ({ ...cell })));
+//   solutionPath = solveMaze();
+// }
 
-// Start maze generation from a non-border cell
-genMaze(1, 1);
+// // Start maze generation from a non-border cell
+// genMaze(1, 1);
 
-// Convert cells to walls array
-const walls = [];
-for (let x = 0; x < rows; x++) {
-  for (let y = 0; y < cols; y++) {
-    const cell = cells[x][y];
-    if (x > 0 && cell.walls.left) walls.push({ column: x, row: y, horizontal: false, length: 1 });
-    if (y > 0 && cell.walls.top) walls.push({ column: x, row: y, horizontal: true, length: 1 });
-  }
-}
+// // Convert cells to walls array
+// const walls = [];
+// for (let x = 0; x < rows; x++) {
+//   for (let y = 0; y < cols; y++) {
+//     const cell = cells[x][y];
+//     if (x > 0 && cell.walls.left) walls.push({ column: x, row: y, horizontal: false, length: 1 });
+//     if (y > 0 && cell.walls.top) walls.push({ column: x, row: y, horizontal: true, length: 1 });
+//   }
+// }
 
-console.log(walls)
+// console.log(walls)
 
-// Map walls to pixel positions
-const pixelWalls = walls.map((wall) => ({
-  x: wall.column * (pathW + wallW),
-  y: wall.row * (pathW + wallW),
-  horizontal: wall.horizontal,
-  length: wall.length * (pathW + wallW)
-}));
+// // Map walls to pixel positions
+// const pixelWalls = walls.map((wall) => ({
+//   x: wall.column * (pathW + wallW),
+//   y: wall.row * (pathW + wallW),
+//   horizontal: wall.horizontal,
+//   length: wall.length * (pathW + wallW)
+// }));
 
-function randomize(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+// function randomize(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
 
-function solveMaze() {
-  const visited =
-    Array.from({ length: rows },
-      () => Array(cols).fill(false));
-  const path = [];
+// function solveMaze() {
+//   const visited =
+//     Array.from({ length: rows },
+//       () => Array(cols).fill(false));
+//   const path = [];
 
-  function dfs(x, y) {
-    if (x < 0 || x >= cols || y < 0 ||
-      y >= rows || visited[y][x]) {
-      return false;
-    }
+//   function dfs(x, y) {
+//     if (x < 0 || x >= cols || y < 0 ||
+//       y >= rows || visited[y][x]) {
+//       return false;
+//     }
 
-    visited[y][x] = true;
-    path.push({ x, y });
+//     visited[y][x] = true;
+//     path.push({ x, y });
 
-    if (x === cols - 1 && y === rows - 1) {
-      return true;
-    }
+//     if (x === cols - 1 && y === rows - 1) {
+//       return true;
+//     }
 
-    const cell = generatedMaze[x][y];
+//     const cell = generatedMaze[x][y];
 
-    if (!cell.walls.top && dfs(x, y - 1)) {
-      return true;
-    }
-    if (!cell.walls.right && dfs(x + 1, y)) {
-      return true;
-    }
-    if (!cell.walls.bottom && dfs(x, y + 1)) {
-      return true;
-    }
-    if (!cell.walls.left && dfs(x - 1, y)) {
-      return true;
-    }
+//     if (!cell.walls.top && dfs(x, y - 1)) {
+//       return true;
+//     }
+//     if (!cell.walls.right && dfs(x + 1, y)) {
+//       return true;
+//     }
+//     if (!cell.walls.bottom && dfs(x, y + 1)) {
+//       return true;
+//     }
+//     if (!cell.walls.left && dfs(x - 1, y)) {
+//       return true;
+//     }
 
-    path.pop();
-    return false;
-  }
+//     path.pop();
+//     return false;
+//   }
 
-  dfs(0, 0);
-  return path;
-}
+//   dfs(0, 0);
+//   return path;
+// }
 
-pixelWalls.forEach(({ x, y, horizontal, length }) => {
-  const wall = document.createElement("div");
-  wall.setAttribute("class", "wall");
-  wall.style.cssText = `
-        left: ${x}px;
-        top: ${y}px;
-        width: ${wallW}px;
-        height: ${length}px;
-        transform: rotate(${horizontal ? -90 : 0}deg);
-    `;
-  mazeElement.appendChild(wall);
+// pixelWalls.forEach(({ x, y, horizontal, length }) => {
+//   const wall = document.createElement("div");
+//   wall.setAttribute("class", "wall");
+//   wall.style.cssText = `
+//         left: ${x}px;
+//         top: ${y}px;
+//         width: ${wallW}px;
+//         height: ${length}px;
+//         transform: rotate(${horizontal ? -90 : 0}deg);
+//     `;
+//   mazeElement.appendChild(wall);
+// });
+
+socket.on('pixelWalls', (pixelWalls) => {
+  console.log('Received Maze:');
+  
+  pixelWalls.forEach(({ x, y, horizontal, length }) => {
+    const wall = document.createElement("div");
+    wall.setAttribute("class", "wall");
+    wall.style.cssText = `
+          left: ${x}px;
+          top: ${y}px;
+          width: ${wallW}px;
+          height: ${length}px;
+          transform: rotate(${horizontal ? -90 : 0}deg);
+      `;
+    mazeElement.appendChild(wall);
+  });
 });
 
 const holes = [
