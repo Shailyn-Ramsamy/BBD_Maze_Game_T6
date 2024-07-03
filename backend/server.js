@@ -3,8 +3,113 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+const clients = new Map();
+const balls = new Map();
+
 const pathW = 25; // Path width
 const wallW = 10; // Wall width
+const ballSize = 10;
+const maxVelocity = 1.5;
+const gravity = 2;
+const friction = 0.01;
+
+function updateBallPhysics(ball, averageOrientation, timeElapsed) {
+  const accelerationX = gravity * Math.sin((averageOrientation.gamma / 180) * Math.PI);
+  const accelerationY = gravity * Math.sin((averageOrientation.beta / 180) * Math.PI);
+  const frictionX = gravity * Math.cos((averageOrientation.gamma / 180) * Math.PI) * friction;
+  const frictionY = gravity * Math.cos((averageOrientation.beta / 180) * Math.PI) * friction;
+
+  const velocityChangeX = accelerationX * timeElapsed;
+  const velocityChangeY = accelerationY * timeElapsed;
+  const frictionDeltaX = frictionX * timeElapsed;
+  const frictionDeltaY = frictionY * timeElapsed;
+
+  ball.velocityX = updateVelocity(ball.velocityX, velocityChangeX, frictionDeltaX);
+  ball.velocityY = updateVelocity(ball.velocityY, velocityChangeY, frictionDeltaY);
+
+  ball.nextX = ball.x + ball.velocityX;
+  ball.nextY = ball.y + ball.velocityY;
+
+  handleWallCollisions(ball);
+
+  ball.x = ball.nextX;
+  ball.y = ball.nextY;
+}
+
+function updateVelocity(velocity, velocityChange, frictionDelta) {
+  if (velocityChange === 0) {
+    return slow(velocity, frictionDelta);
+  } else {
+    velocity += velocityChange;
+    velocity -= Math.sign(velocityChange) * frictionDelta;
+    return Math.max(Math.min(velocity, maxVelocity), -maxVelocity);
+  }
+}
+
+function slow(number, difference) {
+  if (Math.abs(number) <= difference) return 0;
+  if (number > difference) return number - difference;
+  return number + difference;
+}
+
+function handleWallCollisions(ball) {
+  pixelWalls.forEach((wall) => {
+    if (wall.horizontal) {
+      if (
+        ball.nextY + ballSize / 2 >= wall.y - wallW / 2 &&
+        ball.nextY - ballSize / 2 <= wall.y + wallW / 2 &&
+        ball.nextX >= wall.x &&
+        ball.nextX <= wall.x + wall.length
+      ) {
+        if (ball.y < wall.y) {
+          ball.nextY = wall.y - wallW / 2 - ballSize / 2;
+        } else {
+          ball.nextY = wall.y + wallW / 2 + ballSize / 2;
+        }
+        ball.velocityY = -ball.velocityY / 3;
+      }
+    } else {
+      if (
+        ball.nextX + ballSize / 2 >= wall.x - wallW / 2 &&
+        ball.nextX - ballSize / 2 <= wall.x + wallW / 2 &&
+        ball.nextY >= wall.y &&
+        ball.nextY <= wall.y + wall.length
+      ) {
+        if (ball.x < wall.x) {
+          ball.nextX = wall.x - wallW / 2 - ballSize / 2;
+        } else {
+          ball.nextX = wall.x + wallW / 2 + ballSize / 2;
+        }
+        ball.velocityX = -ball.velocityX / 3;
+      }
+    }
+  });
+}
+
+let gameRunning = true;
+
+function gameLoop() {
+  if (!gameRunning) {
+    return; // Exit the function if gameRunning is false
+  }
+  const now = Date.now();
+  const timeElapsed = (now - lastUpdate) / 16; // Assuming 60 FPS
+  lastUpdate = now;
+
+  balls.forEach((ball) => {
+    updateBallPhysics(ball, averageOrientation, timeElapsed);
+  });
+
+  console.log(balls)
+
+  io.emit('updateBallPositions',  Array.from(balls.values()));
+
+  setTimeout(gameLoop, 1000 / 60); // Run at 60 FPS
+}
+
+let lastUpdate = Date.now();
+let gameStarted = false;
+
 
 app.use(express.static(__dirname));
 
@@ -157,8 +262,49 @@ function solveMaze() {
   return path;
 }
 
+const MAX_CLIENTS = 4;
+const ballPositions = [
+  { column: 1, row: 1 },
+  { column: 8, row: 1 },
+  { column: 1, row: 8 },
+  { column: 8, row: 8 }
+];
+
 io.on('connection', (socket) => {
   console.log('a user connected with ID:', socket.id);
+
+  
+  if (clients.size < MAX_CLIENTS) {
+    const ballPosition = ballPositions[clients.size];
+    const ball = {
+      id: socket.id,
+      x: ballPosition.column * (wallW + pathW) + (wallW / 2 + pathW / 2),
+      y: ballPosition.row * (wallW + pathW) + (wallW / 2 + pathW / 2),
+      velocityX: 0,
+      velocityY: 0
+    };
+    clients.set(socket.id, { ballPosition });
+    balls.set(socket.id, ball);
+
+    // Notify all clients about the new ball
+    io.emit('newBall', ball);
+
+    // Send the current state of all balls to the new client
+    socket.emit('existingBalls', Array.from(balls.values()));
+  } else {
+    console.log('Maximum number of clients reached. Rejecting connection.');
+    socket.disconnect(true);
+    return;
+  }
+
+  socket.on('startGame', () => {
+    if (!gameStarted) {
+      gameStarted = true;
+      lastUpdate = Date.now();
+      gameLoop();
+    }
+    io.emit('gameStarted');
+  });
 
   if (!host){
     host = socket.id
@@ -166,12 +312,7 @@ io.on('connection', (socket) => {
     io.emit('host', host)
   }
 
-  socket.on('startGame', () => {
-    start = true; // Set start to true
-    io.emit('gameStarted'); // Emit gameStarted event to all clients
-  });
 
-  
   io.emit('pixelWalls', pixelWalls);
 
   io.emit('walls', pixelWalls);
@@ -188,12 +329,27 @@ io.on('connection', (socket) => {
     
     averageOrientation = calculateAverageOrientation();
     
+    
     // Broadcast the average orientation to all clients
     io.emit('averageOrientation', averageOrientation);
   });
 
+  socket.on('gameWon', (ballId) => {
+    // Implement win logic here, e.g., broadcast a win event to all clients
+    console.log(`Ball ${ballId} has won the game!`);
+  
+    // Broadcast the win event to all clients
+    gameRunning = false;
+    io.emit('gameWon', ballId);
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected:', socket.id);
+    if (clients.has(socket.id)) {
+      clients.delete(socket.id);
+      balls.delete(socket.id);
+      io.emit('removeBall', socket.id);
+    }
     delete clientOrientationData[socket.id];
     averageOrientation = calculateAverageOrientation();
     io.emit('averageOrientation', averageOrientation);
