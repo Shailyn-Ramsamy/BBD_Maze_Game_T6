@@ -8,6 +8,7 @@ Follow me on twitter for more: https://twitter.com/HunorBorbely
 
 const socket = io();
 let socketId = null;
+isHost = false;
 
 Math.minmax = (value, limit) => {
   return Math.max(Math.min(value, limit), -limit);
@@ -89,10 +90,29 @@ const slow = (number, difference) => {
 };
 
 const mazeElement = document.getElementById("maze");
-const joystickButton = document.getElementById("joystick-head");
-joystickButton.addEventListener("click", startGame);
+// const joystickButton = document.getElementById("joystick-head");
+// joystickButton.addEventListener("click", startGame);
+
+socket.on('host', (host) => {
+  if (socket.id  === host){
+    isHost = true;
+    document.getElementById('start-game-button').style.display = 'block';
+  }
+});
+
+document.getElementById('start-game-button').addEventListener('click', () => {
+  if (isHost) {
+    socket.emit('startGame');
+  }
+});
+
+socket.on('gameStarted', () => {
+  startGame();
+});
+
 
 function startGame() {
+  console.log("JIDWADWIDWWDJIDIWJAIJIJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
   if (!gameInProgress) {
     gameInProgress = true;
     window.requestAnimationFrame(main);

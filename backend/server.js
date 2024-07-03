@@ -14,6 +14,8 @@ app.get('/', (req, res) => {
 
 const clientOrientationData = {};
 let averageOrientation = { beta: 0, gamma: 0 };
+let host = null
+let start = false
 
 function calculateAverageOrientation() {
   const clientCount = Object.keys(clientOrientationData).length;
@@ -158,6 +160,18 @@ function solveMaze() {
 io.on('connection', (socket) => {
   console.log('a user connected with ID:', socket.id);
 
+  if (!host){
+    host = socket.id
+    console.log(host + "is host")
+    io.emit('host', host)
+  }
+
+  socket.on('startGame', () => {
+    start = true; // Set start to true
+    io.emit('gameStarted'); // Emit gameStarted event to all clients
+  });
+
+  
   io.emit('pixelWalls', pixelWalls);
 
   io.emit('walls', pixelWalls);
@@ -183,6 +197,17 @@ io.on('connection', (socket) => {
     delete clientOrientationData[socket.id];
     averageOrientation = calculateAverageOrientation();
     io.emit('averageOrientation', averageOrientation);
+
+    if (socket.id === host) {
+      host = null; // Reset host
+      // Optionally, you can assign a new host from the remaining clients
+      const remainingClients = Object.keys(clientOrientationData);
+      if (remainingClients.length > 0) {
+        host = remainingClients[0];
+        io.emit('host', host);
+      }
+    }
+
   });
 });
 
