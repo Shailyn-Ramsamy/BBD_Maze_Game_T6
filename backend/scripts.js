@@ -141,14 +141,14 @@ function handleOrientation(event) {
 
   // Emit orientation data to the server with socket ID
   socket.emit('gyroscopeData', { socketId, beta, gamma });
-  
+
   console.log(`Orientation - Beta: ${beta}, Gamma: ${gamma}`);
 }
 
 // Listen for average orientation updates from the server
 socket.on('averageOrientation', (averageOrientation) => {
   console.log('Received average orientation:', averageOrientation);
-  
+
   // Apply the average orientation to the maze
   const rotationY = averageOrientation.gamma * 0.8; // Adjust the multiplier based on sensitivity
   const rotationX = averageOrientation.beta * 0.8; // Adjust the multiplier based on sensitivity
@@ -328,22 +328,8 @@ balls.forEach(({ x, y }) => {
 //   return path;
 // }
 
-// pixelWalls.forEach(({ x, y, horizontal, length }) => {
-//   const wall = document.createElement("div");
-//   wall.setAttribute("class", "wall");
-//   wall.style.cssText = `
-//         left: ${x}px;
-//         top: ${y}px;
-//         width: ${wallW}px;
-//         height: ${length}px;
-//         transform: rotate(${horizontal ? -90 : 0}deg);
-//     `;
-//   mazeElement.appendChild(wall);
-// });
 
 socket.on('pixelWalls', (pixelWalls) => {
-  console.log('Received Maze:');
-  
   pixelWalls.forEach(({ x, y, horizontal, length }) => {
     const wall = document.createElement("div");
     wall.setAttribute("class", "wall");
@@ -357,6 +343,7 @@ socket.on('pixelWalls', (pixelWalls) => {
     mazeElement.appendChild(wall);
   });
 });
+
 
 const holes = [
   { column: 0, row: 5 },
@@ -516,6 +503,10 @@ function checkBallCollision(ball1, ball2) {
   return distance < ballSize;
 }
 
+socket.on('walls', (pixelWalls) => {
+  wallls = pixelWalls
+});
+
 function main(timestamp) {
   // It is possible to reset the game mid-game. This case the look should stop
   if (!gameInProgress) return;
@@ -571,7 +562,8 @@ function main(timestamp) {
 
         if (debugMode) console.log("tick", ball);
 
-        pixelWalls.forEach((wall, wi) => {
+
+        wallls.forEach((wall, wi) => {
           if (wall.horizontal) {
             // Horizontal wall
 
@@ -760,7 +752,10 @@ function main(timestamp) {
             }
           }
         });
-        
+
+
+
+
 
         for (let i = 0; i < balls.length - 1; i++) {
           for (let j = i + 1; j < balls.length; j++) {

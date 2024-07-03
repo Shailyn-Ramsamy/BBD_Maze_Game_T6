@@ -158,9 +158,11 @@ function solveMaze() {
 io.on('connection', (socket) => {
   console.log('a user connected with ID:', socket.id);
 
-  clientOrientationData[socket.id] = { beta: 0, gamma: 0 };
-
   io.emit('pixelWalls', pixelWalls);
+
+  io.emit('walls', pixelWalls);
+
+  clientOrientationData[socket.id] = { beta: 0, gamma: 0 };
 
   socket.on('gyroscopeData', (data) => {
     console.log('Gyroscope data received from', data.socketId, ':', data);
