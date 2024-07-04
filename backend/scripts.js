@@ -192,6 +192,10 @@ socket.on('averageOrientation', (averageOrientation) => {
   }
 });
 
+socket.on('maxClientsReached', (message) => {
+  alert(message);
+});
+
 let initialGamma = 0;
 
 if (window.DeviceOrientationEvent) {
@@ -388,7 +392,7 @@ function checkWinCondition(ball) {
   }
 }
 
-// Call checkWinCondition for each ball on a regular interval (e.g., every frame update)
+// Call checkWinCondition for each ball on a regular interval 
 function checkAllBalls() {
   ballElements.forEach(ballElement => {
     const ball = balls.find(b => `ball-${b.id}` === ballElement.id);
@@ -412,5 +416,5 @@ socket.on('gameWon', (ballId) => {
 });
 
 
-// Example: Call checkAllBalls every 100 milliseconds
+// Call checkAllBalls every 100 milliseconds
 setInterval(checkAllBalls, 100);

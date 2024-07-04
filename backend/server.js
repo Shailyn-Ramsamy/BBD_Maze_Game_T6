@@ -6,8 +6,8 @@ const io = require('socket.io')(http);
 const clients = new Map();
 const balls = new Map();
 
-const pathW = 25; // Path width
-const wallW = 10; // Wall width
+const pathW = 25;
+const wallW = 10;
 const ballSize = 10;
 const maxVelocity = 1.5;
 const gravity = 2;
@@ -153,7 +153,7 @@ function gameLoop() {
     return; // Exit the function if gameRunning is false
   }
   const now = Date.now();
-  const timeElapsed = (now - lastUpdate) / 16; // Assuming 60 FPS
+  const timeElapsed = (now - lastUpdate) / 16; // 60 FPS
   lastUpdate = now;
 
   balls.forEach((ball) => {
@@ -335,14 +335,20 @@ const ballPositions = [
 io.on('connection', (socket) => {
   console.log('a user connected with ID:', socket.id);
 
+  if (clients.size >= MAX_CLIENTS - 1) {
+    console.log('Maximum number of clients reached. Rejecting connection.');
+    socket.emit('maxClientsReached', 'Maximum number of clients reached. Please try again later.');
+    socket.disconnect(true);
+    return;
+  }
+
+
   if (!host) {
     host = socket.id
     console.log(host + "is host")
     io.emit('host', host)
   }
-
-
-  else if (clients.size < MAX_CLIENTS) {
+  else if (clients.size < ballPositions.length) {
     const ballPosition = ballPositions[clients.size];
     const ball = {
       id: socket.id,
@@ -419,12 +425,11 @@ io.on('connection', (socket) => {
 
     if (socket.id === host) {
       host = null; // Reset host
-      // Optionally, you can assign a new host from the remaining clients
-      const remainingClients = Object.keys(clientOrientationData);
-      if (remainingClients.length > 0) {
-        host = remainingClients[0];
-        io.emit('host', host);
-      }
+      // const remainingClients = Object.keys(clientOrientationData);
+      // if (remainingClients.length > 0) {
+      //   host = remainingClients[0];
+      //   io.emit('host', host);
+      // }
     }
 
   });
