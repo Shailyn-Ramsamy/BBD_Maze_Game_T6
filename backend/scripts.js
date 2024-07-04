@@ -91,11 +91,20 @@ const slow = (number, difference) => {
 
 const mazeElement = document.getElementById("maze");
 
+document.addEventListener("DOMContentLoaded", function () {
+  var overlay = document.getElementById('overlay');
+  var button = document.getElementById('join-button');
+
+  button.addEventListener('click', function () {
+    overlay.style.display = 'none'; // Hide the overlay when "Join" is clicked
+  });
+});
+
 // const joystickButton = document.getElementById("joystick-head");
 // joystickButton.addEventListener("click", startGame);
 
 socket.on('host', (host) => {
-  if (socket.id  === host){
+  if (socket.id === host) {
     isHost = true;
     document.getElementById('start-game-button').style.display = 'block';
   }
@@ -176,9 +185,11 @@ socket.on('averageOrientation', (averageOrientation) => {
   const rotationY = averageOrientation.gamma * 0.8; // Adjust the multiplier based on sensitivity
   const rotationX = averageOrientation.beta * 0.8; // Adjust the multiplier based on sensitivity
 
-  mazeElement.style.cssText = `
-    transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
-  `;
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    mazeElement.style.cssText = `
+      transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
+    `;
+  }
 });
 
 let initialGamma = 0;
@@ -237,7 +248,7 @@ function createBallElement(ball) {
   ballElement.style.height = `${ballSize}px`;
   ballElement.style.backgroundColor = getNextColor();
 
-  
+
 
   mazeElement.appendChild(ballElement);
   balls.push(ball);
@@ -332,7 +343,7 @@ function announceWinner(color) {
 
   let text;
 
-  if (colour = ""){
+  if (colour = "") {
 
   }
 

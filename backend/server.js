@@ -102,7 +102,7 @@ function gameLoop() {
 
   console.log(balls)
 
-  io.emit('updateBallPositions',  Array.from(balls.values()));
+  io.emit('updateBallPositions', Array.from(balls.values()));
 
   setTimeout(gameLoop, 1000 / 60); // Run at 60 FPS
 }
@@ -145,15 +145,15 @@ const cols = 10;
 
 const cells = [];
 for (let x = 0; x < cols; x++) {
-    cells[x] = [];
-    for (let y = 0; y < rows; y++) {
-        cells[x][y] = {
-            x,
-            y,
-            walls: { top: true, right: true, bottom: true, left: true },
-            visited: false
-        };
-    }
+  cells[x] = [];
+  for (let y = 0; y < rows; y++) {
+    cells[x][y] = {
+      x,
+      y,
+      walls: { top: true, right: true, bottom: true, left: true },
+      visited: false
+    };
+  }
 }
 
 function genMaze(x, y) {
@@ -262,7 +262,7 @@ function solveMaze() {
   return path;
 }
 
-const MAX_CLIENTS = 4;
+const MAX_CLIENTS = 5;
 const ballPositions = [
   { column: 1, row: 1 },
   { column: 8, row: 1 },
@@ -273,8 +273,14 @@ const ballPositions = [
 io.on('connection', (socket) => {
   console.log('a user connected with ID:', socket.id);
 
-  
-  if (clients.size < MAX_CLIENTS) {
+  if (!host) {
+    host = socket.id
+    console.log(host + "is host")
+    io.emit('host', host)
+  }
+
+
+  else if (clients.size < MAX_CLIENTS) {
     const ballPosition = ballPositions[clients.size];
     const ball = {
       id: socket.id,
@@ -306,11 +312,6 @@ io.on('connection', (socket) => {
     io.emit('gameStarted');
   });
 
-  if (!host){
-    host = socket.id
-    console.log(host + "is host")
-    io.emit('host', host)
-  }
 
 
   io.emit('pixelWalls', pixelWalls);
@@ -321,15 +322,15 @@ io.on('connection', (socket) => {
 
   socket.on('gyroscopeData', (data) => {
     console.log('Gyroscope data received from', data.socketId, ':', data);
-    
+
     clientOrientationData[data.socketId] = {
       beta: data.beta,
       gamma: data.gamma
     };
-    
+
     averageOrientation = calculateAverageOrientation();
-    
-    
+
+
     // Broadcast the average orientation to all clients
     io.emit('averageOrientation', averageOrientation);
   });
@@ -337,7 +338,7 @@ io.on('connection', (socket) => {
   socket.on('gameWon', (ballId) => {
     // Implement win logic here, e.g., broadcast a win event to all clients
     console.log(`Ball ${ballId} has won the game!`);
-  
+
     // Broadcast the win event to all clients
     gameRunning = false;
     io.emit('gameWon', ballId);
