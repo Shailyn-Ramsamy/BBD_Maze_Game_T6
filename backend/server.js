@@ -86,6 +86,66 @@ function handleWallCollisions(ball) {
   });
 }
 
+function checkBallCollision(ball1, ball2) {
+  const dx = ball2.x - ball1.x;
+  const dy = ball2.y - ball1.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < ballSize;
+}
+
+function handleBallCollisions() {
+  const ballArray = Array.from(balls.values());
+  for (let i = 0; i < ballArray.length; i++) {
+    for (let j = i + 1; j < ballArray.length; j++) {
+      const ball1 = ballArray[i];
+      const ball2 = ballArray[j];
+      const dx = ball2.x - ball1.x;
+      const dy = ball2.y - ball1.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < ballSize) {
+        // Collision detected
+        const overlap = ballSize - distance;
+        const angle = Math.atan2(dy, dx);
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+
+        // Separate the balls
+        const halfOverlap = overlap / 2;
+        ball1.x -= halfOverlap * cos;
+        ball1.y -= halfOverlap * sin;
+        ball2.x += halfOverlap * cos;
+        ball2.y += halfOverlap * sin;
+
+        // Adjust velocities
+        const v1 = rotate(ball1.velocityX, ball1.velocityY, sin, cos, true);
+        const v2 = rotate(ball2.velocityX, ball2.velocityY, sin, cos, true);
+
+        const temp = v1.x;
+        v1.x = v2.x;
+        v2.x = temp;
+
+        // Rotate velocities back
+        const v1Final = rotate(v1.x, v1.y, sin, cos, false);
+        const v2Final = rotate(v2.x, v2.y, sin, cos, false);
+
+        ball1.velocityX = v1Final.x;
+        ball1.velocityY = v1Final.y;
+        ball2.velocityX = v2Final.x;
+        ball2.velocityY = v2Final.y;
+      }
+    }
+  }
+}
+
+function rotate(x, y, sin, cos, reverse) {
+  return {
+    x: reverse ? (x * cos + y * sin) : (x * cos - y * sin),
+    y: reverse ? (y * cos - x * sin) : (y * cos + x * sin)
+  };
+}
+
+
+
 let gameRunning = true;
 
 function gameLoop() {
@@ -99,6 +159,8 @@ function gameLoop() {
   balls.forEach((ball) => {
     updateBallPhysics(ball, averageOrientation, timeElapsed);
   });
+
+  handleBallCollisions();
 
   console.log(balls)
 

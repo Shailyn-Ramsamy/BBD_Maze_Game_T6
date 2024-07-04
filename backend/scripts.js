@@ -216,7 +216,7 @@ function setInitialMazeOrientation(initialGamma) {
   `;
 }
 
-const colors = ['#FF0000', '#00FF00', '#0000FF', '#800080']; // Array of predefined colors
+const colors = ['#FF0000', '#00FF00', '#0000FF', '#e603da']; // Array of predefined colors
 let currentColorIndex = 0;
 
 function getNextColor() {
@@ -307,7 +307,7 @@ function getColorName(rgb) {
     '255,0,0': 'Red',
     '0,255,0': 'Green',
     '0,0,255': 'Blue',
-    '128,0,128': 'Purple',
+    '230,3,218': 'Purple',
     // Add more colors as needed
   };
 
