@@ -345,6 +345,7 @@ io.on('connection', (socket) => {
 
   if (!host) {
     host = socket.id
+    gameRunning = true
     console.log(host + "is host")
     io.emit('host', host)
   }
@@ -408,7 +409,7 @@ io.on('connection', (socket) => {
     console.log(`Ball ${ballId} has won the game!`);
 
     // Broadcast the win event to all clients
-    gameRunning = false;
+    // gameRunning = false;
     io.emit('gameWon', ballId);
   });
 
